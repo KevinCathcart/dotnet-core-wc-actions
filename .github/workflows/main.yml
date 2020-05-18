@@ -33,15 +33,38 @@ jobs:
     # Build and push the image to Azure Container Registry
     - name: Build and Push container to ACR
       run: |
-        docker build -t ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/dotnetcorewc:${{ github.sha }} taskapp/taskapp/
-        docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/dotnetcorewc:${{ github.sha }}
+        docker build -t ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }} taskapp/taskapp/
+        docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
 
     # Deploy your container to App Service
     - name: Deploy Container to Azure App Service
       uses: azure/webapps-container-deploy@v1
       with:
-        app-name: 'jefmarti-dotnet-core-wc-blog'
-        images: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/dotnetcorewc:${{ github.sha }}
+        app-name: ${{ secrets.APP_NAME }}
+        images: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
+    
+      # **** UNCOMMENT IF USING DOCKER HUB **** 
+    # Use docker login
+    #- name: Docker login to ACR
+    #  uses: azure/docker-login@v1
+    #  with:
+    #    username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #    password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+    # Build and push your image to Docker Hub
+    #- name: Build and Push container to Docker Hub
+    #  run: |
+    #    docker build -t ${{ secrets.DOCKERHUB_REGISTRY_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }} taskapp/taskapp/
+    #    docker push ${{ secrets.DOCKERHUB_REGISTRY_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}  
+  
+    # Deploy your container to App Service
+    #- name: Deploy Container to Azure App Service
+    #  uses: azure/webapps-container-deploy@v1
+    #  with:
+    #    app-name: ${{ secrets.APP_NAME }}
+    #    images: ${{ secrets.DOCKERHUB_REGISTRY_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
+  # *************************************** 
+    
     
     # Deploy a dacpac file to a provisioned SQL server
     #- name: Azure SQL Deploy
