@@ -8,7 +8,8 @@ EXPOSE 443
 # Add the SDK so you can run the following restore and build commands
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1809 AS build
 WORKDIR /src
-COPY ["taskapp/taskapp.csproj", "taskapp/"]
+#COPY ["taskapp/taskapp.csproj", "taskapp/"]
+COPY *.csproj ./
 RUN dotnet restore "taskapp/taskapp.csproj"
 COPY . .
 WORKDIR "/src/taskapp"
