@@ -1,72 +1,48 @@
 name: Build and Deploy Windows Container App to Azure App Service
 
-# Trigger the build on commits into the master branch
 on:
   push:
     branches:
       - master
 
-# Starts jobs and sets the type of runner (Windows) they will run on
 jobs:
-  build-and-deploy-to-azure:
+  build-and-deploy-to-dev:
     runs-on: windows-latest
     
     steps:
       
-    # Checks out repository so your workflow can access it
+    # Check out the repo to the app service VMs
     - uses: actions/checkout@v1
-    
-    # Authenticate a Service Principal to deploy to your Web App
-    - name: Azure Service Principal Authentication
-      uses: azure/login@v1
-      with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
                
-    # Use docker login to log into ACR 
+    # Use docker login to log into ACR
     - name: Docker login to ACR
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io
+        login-server: jefmartiregistry.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
         
-    # Build and push your image to Azure Container Registry 
+    # Build and push the image to Azure Container Registry
     - name: Build and Push container to ACR
       run: |
-        docker build --file=taskapp/taskapp/Dockerfile -t ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }} .
-        docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}  
-       
-  # **** UNCOMMENT IF USING DOCKER HUB **** 
-    # Use docker login
-    #- name: Docker login to ACR
-    #  uses: azure/docker-login@v1
-    #  with:
-    #    username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #    password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        docker build -t jefmartiregistry.azurecr.io/dotnetcorewc:${{ github.sha }} taskapp/taskapp/
+        docker push jefmartiregistry.azurecr.io/dotnetcorewc:${{ github.sha }}
+    
+    # Authenticate a Service Principal to continuously deploy to your provisioned app service
+    - name: Azure Authentication
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    # Build and push your image to Docker Hub
-    #- name: Build and Push container to Docker Hub
-    #  run: |
-    #    docker build --file=taskapp/taskapp/Dockerfile -t ${{ secrets.DOCKERHUB_REGISTRY_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }} .
-    #    docker push ${{ secrets.DOCKERHUB_REGISTRY_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}  
-  # ***************************************      
-      
-    # Deploy your container to App Service 
+    # Deploy your container to App Service
     - name: Deploy Container to Azure App Service
+ #     uses: azure/webapps-deploy@releases/v2
       uses: azure/webapps-container-deploy@v1
       with:
-        app-name: ${{ secrets.APP_NAME }}
-        images: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
-        
-  # **** UNCOMMENT IF USING DOCKER HUB **** 
-    #- name: Deploy Container to Azure App Service
-    #  uses: azure/webapps-container-deploy@v1
-    #  with:
-    #    app-name: ${{ secrets.APP_NAME }}
-    #    images: ${{ secrets.DOCKERHUB_REGISTRY_NAME }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
-  # *************************************** 
+        app-name: 'jefmarti-dotnet-core-wc-blog'
+        images: 'jefmartiregistry.azurecr.io/dotnetcorewc:${{ github.sha }}'
     
-    # Deploy a dacpac file to your SQL server
+    # Deploy a dacpac file to a provisioned SQL server
     #- name: Azure SQL Deploy
     #  uses: Azure/sql-action@v1
     #  with:
