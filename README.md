@@ -15,4 +15,4 @@ A containerized (Windows) .NET Framework Task App setup with continuous deployme
       - REGISTRY_USERNAME = your registry username
       - REGISTRY_PASSWORD = your registry password
   
-3. *Commit changes to your master branch* that will trigger your build
+3. *Commit changes to your master branch* to trigger your build
