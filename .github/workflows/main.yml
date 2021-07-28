@@ -35,13 +35,22 @@ jobs:
       run: |
         docker build -t ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }} taskapp/taskapp/
         docker push ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
-
-    # Deploy your container to App Service
-    - name: Deploy Container to Azure App Service
-      uses: azure/webapps-container-deploy@v1
-      with:
+        
+    - name: Deploy container to Azure App Service
+      uses: Azure/webapps-deploy@v2
+      with: 
         app-name: ${{ secrets.APP_NAME }}
+        #publish-profile:
         images: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
+        
+    # Deploy your container to App Service
+    #- name: Deploy Container to Azure App Service
+     # uses: azure/webapps-container-deploy@v1
+      #with:
+       # app-name: ${{ secrets.APP_NAME }}
+        #images: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:${{ github.sha }}
+
+        
         
         
     
