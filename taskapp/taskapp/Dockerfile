@@ -1,10 +1,10 @@
 # Set the base image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-nanoserver-1809 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-nanoserver-ltsc2022 AS base
 WORKDIR /app
 EXPOSE 80
 
 # Add the SDK so you can run the dotnet restore and build commands
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1809 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-nanoserver-ltsc2022 AS build
 WORKDIR /src
 COPY *.csproj ./
 RUN dotnet restore "taskapp.csproj"
