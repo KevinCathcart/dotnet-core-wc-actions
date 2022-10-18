@@ -20,7 +20,9 @@ jobs:
     # Authenticate a Service Principal to deploy to your Web App
     
       
-        
+    - name: testing
+      run: |
+        dir "C:/Program Files (x86)/Windows Kits/10/Debuggers/x64"
         
         
     # Build and push the image to Azure Container Registry
