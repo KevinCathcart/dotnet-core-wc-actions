@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 # Starts jobs and sets the type of runner (Windows) they will run on.
 jobs:
